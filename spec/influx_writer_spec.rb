@@ -13,12 +13,22 @@ describe DtuMonitoring::InfluxWriter do
   end
 
   describe 'write' do
-    let(:test_api) { 'http://influxapi.test.dtu.dk:8089/write?db=dtu' }
-    it 'should make a http request' do
-      ENV['INFLUX_API'] = test_api
-      stub = stub_request(:post, test_api).with(body: req_body).and_return(status: 204)
-      described_class.write('test_measurement', tags, vals, tstamp)
-      expect(stub).to have_been_requested
+    context 'when the env var is set' do
+      let(:test_api) { 'http://influxapi.test.dtu.dk:8089/write?db=dtu' }
+      it 'should make a http request' do
+        ENV['INFLUX_API'] = test_api
+        stub = stub_request(:post, test_api).with(body: req_body).and_return(status: 204)
+        described_class.write('test_measurement', tags, vals, tstamp)
+        expect(stub).to have_been_requested
+      end
+    end
+    context 'when the env var is not set' do
+      it 'should_not raise_error' do
+        ENV.delete('INFLUX_API')
+        expect {
+          described_class.write('test_measurement', tags, vals, tstamp)
+        }.not_to raise_error
+      end
     end
   end
 end

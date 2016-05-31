@@ -3,7 +3,7 @@ module DtuMonitoring
 
     def self.write(measurement, tags, values, tstamp)
       api = ENV['INFLUX_API']
-      fail 'ENV VAR INFLUX_API not set!' unless api.size > 0
+      return if api.nil? # ENV VAR INFLUX_API not set!
       request_body = self.body(measurement, tags, values, tstamp)
       self.post(api, request_body)
     end
