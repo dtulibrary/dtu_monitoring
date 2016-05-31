@@ -1,3 +1,4 @@
+require 'json'
 module DtuMonitoring
   class BlacklightResponse
 
@@ -9,11 +10,17 @@ module DtuMonitoring
       DtuMonitoring::InfluxWriter.write(MEASUREMENT, tags, values, timestamp)
     end
 
+    def self.write(app_name, parsed_response, timestamp)
+      tags = self.tags(app_name)
+      DtuMonitoring::InfluxWriter.write(MEASUREMENT, tags, parsed_response, timestamp)
+    end
+
     def self.parse(response)
-      value = response['responseHeader']['QTime']
-      status = response['responseHeader']['status']
-      query =  response['responseHeader']['params']['q']
-      num_docs = response['response']['numFound']
+      data = JSON.parse(response)
+      value = data['responseHeader']['QTime']
+      status = data['responseHeader']['status']
+      query =  data['responseHeader']['params']['q']
+      num_docs = data['response']['numFound']
       { value: value, status: status, q: query, num_docs: num_docs }
     end
 
