@@ -14,7 +14,7 @@ module DtuMonitoring
       post = Net::HTTP::Post.new(uri)
       post.body = body
       response = http.request(post)
-      fail 'Influx Write did not succeed!' unless response.code == '204'
+      fail "Influx Write failed - #{response.message}" unless response.code == '204'
       true
     end
 
